@@ -1,0 +1,28 @@
+{
+  "name": "vibewithme",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "vibewithme": "./dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "@vibewithme/tui": "*",
+    "@vibewithme/shared": "*",
+    "commander": "^13.0.0",
+    "ink": "^6.0.0",
+    "react": "^19.0.0"
+  }
+}

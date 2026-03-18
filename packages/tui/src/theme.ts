@@ -1,0 +1,43 @@
+export const theme = {
+  colors: {
+    bg: "#1e1e2e",
+    surface: "#313244",
+    border: "#45475a",
+    borderFocus: "#89b4fa",
+    text: "#cdd6f4",
+    textDim: "#6c7086",
+    textBright: "#f5f5f5",
+    primary: "#89b4fa",
+    secondary: "#a6e3a1",
+    accent: "#f5c2e7",
+    warning: "#f9e2af",
+    error: "#f38ba8",
+    success: "#a6e3a1",
+    aiBubble: "#b4befe",
+    userBubble: "#89b4fa",
+    systemText: "#6c7086",
+  },
+  borders: {
+    single: "single" as const,
+    double: "double" as const,
+    round: "round" as const,
+    bold: "bold" as const,
+  },
+  icons: {
+    file: "  ",
+    folder: "  ",
+    folderOpen: "  ",
+    chevronRight: " >",
+    chevronDown: " v",
+    online: " *",
+    offline: " o",
+    idle: " ~",
+    ai: " #",
+    lock: " !",
+    check: " +",
+    cross: " x",
+    spinner: " -",
+  },
+} as const;
+
+export type Theme = typeof theme;
