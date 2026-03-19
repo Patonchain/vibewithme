@@ -5,6 +5,8 @@ import { Footer } from "./components/layout/Footer.js";
 import { Sidebar } from "./components/layout/Sidebar.js";
 import { MainPanel } from "./components/layout/MainPanel.js";
 import { ChatPanel } from "./components/layout/ChatPanel.js";
+import { CommandPalette } from "./components/shared/CommandPalette.js";
+import { InviteModal } from "./components/team/InviteModal.js";
 import { useKeyBindings } from "./hooks/useKeyBindings.js";
 import { useUIStore } from "./store/ui.js";
 import { useWorkspaceStore } from "./store/workspace.js";
@@ -47,6 +49,8 @@ export function App({ projectPath, serverUrl, token, roomId }: AppProps) {
   const setTerminalSize = useUIStore((s) => s.setTerminalSize);
   const setProjectPath = useWorkspaceStore((s) => s.setProjectPath);
   const { loadProject } = useFileSystem();
+  const modal = useUIStore((s) => s.modal);
+  const setModal = useUIStore((s) => s.setModal);
 
   // Collaboration
   const collab = useCollaboration(serverUrl, token, roomId);
@@ -91,6 +95,31 @@ export function App({ projectPath, serverUrl, token, roomId }: AppProps) {
           <ChatPanel />
         </Box>
         <Footer />
+
+        {/* Modal overlays */}
+        {modal === "command-palette" && (
+          <Box
+            position="absolute"
+            marginTop={3}
+            marginLeft={20}
+          >
+            <CommandPalette onClose={() => setModal(null)} />
+          </Box>
+        )}
+
+        {modal === "invite" && (
+          <Box
+            position="absolute"
+            marginTop={5}
+            marginLeft={15}
+          >
+            <InviteModal
+              serverUrl={serverUrl}
+              token={token}
+              onClose={() => setModal(null)}
+            />
+          </Box>
+        )}
       </Box>
     </CollabContext.Provider>
   );

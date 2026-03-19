@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Text } from "ink";
 import { theme } from "../../theme.js";
 import { useUIStore } from "../../store/ui.js";
 import { FileTree } from "../workspace/FileTree.js";
+import { SecretsList } from "../secrets/SecretsList.js";
+import { SecretForm } from "../secrets/SecretForm.js";
+import { TeamPanel } from "../team/TeamPanel.js";
 
 const tabs = [
   { id: "files" as const, label: "Files" },
@@ -11,8 +14,9 @@ const tabs = [
 ];
 
 export function Sidebar() {
-  const { focusedPanel, sidebarTab, setSidebarTab } = useUIStore();
+  const { focusedPanel, sidebarTab, setSidebarTab, setModal } = useUIStore();
   const isFocused = focusedPanel === "sidebar";
+  const [showSecretForm, setShowSecretForm] = useState(false);
 
   return (
     <Box
@@ -41,13 +45,20 @@ export function Sidebar() {
       {/* Tab content */}
       <Box flexDirection="column" flexGrow={1} paddingX={1}>
         {sidebarTab === "files" && <FileTree isFocused={isFocused} />}
-        {sidebarTab === "secrets" && (
-          <Text color={theme.colors.textDim}>No secrets yet</Text>
+        {sidebarTab === "secrets" && !showSecretForm && (
+          <SecretsList
+            isFocused={isFocused}
+            onAddNew={() => setShowSecretForm(true)}
+          />
+        )}
+        {sidebarTab === "secrets" && showSecretForm && (
+          <SecretForm onClose={() => setShowSecretForm(false)} />
         )}
         {sidebarTab === "team" && (
-          <Box flexDirection="column">
-            <Text color={theme.colors.success}>* you (online)</Text>
-          </Box>
+          <TeamPanel
+            isFocused={isFocused}
+            onInvite={() => setModal("invite")}
+          />
         )}
       </Box>
     </Box>
