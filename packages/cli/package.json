@@ -1,6 +1,6 @@
 {
   "name": "vibewithme",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Collaborative terminal IDE for vibe coding. Figma meets v0, in your terminal.",
   "type": "module",
   "bin": {
@@ -43,12 +43,12 @@
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
+    "@vibewithme/tui": "*",
+    "@vibewithme/shared": "*",
     "tsup": "^8.3.0",
     "typescript": "^5.7.0"
   },
   "dependencies": {
-    "@vibewithme/tui": "*",
-    "@vibewithme/shared": "*",
     "commander": "^13.0.0",
     "ink": "^6.0.0",
     "react": "^19.0.0"
