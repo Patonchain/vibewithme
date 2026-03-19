@@ -1,6 +1,7 @@
 {
   "name": "vibewithme",
   "version": "0.1.0",
+  "description": "Collaborative terminal IDE for vibe coding. Figma meets v0, in your terminal.",
   "type": "module",
   "bin": {
     "vibewithme": "./dist/bin.js"
@@ -8,10 +9,37 @@
   "files": [
     "dist"
   ],
+  "keywords": [
+    "cli",
+    "terminal",
+    "tui",
+    "collaborative",
+    "ide",
+    "vibe-coding",
+    "claude",
+    "ai",
+    "react",
+    "ink"
+  ],
+  "author": "Pat <pat@joinaccelr8.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Patonchain/vibewithme.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/Patonchain/vibewithme",
+  "bugs": {
+    "url": "https://github.com/Patonchain/vibewithme/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
