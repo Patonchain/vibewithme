@@ -2,14 +2,19 @@ import React from "react";
 import { render } from "ink";
 import { Command } from "commander";
 import path from "node:path";
+import fs from "node:fs";
+import { fileURLToPath } from "node:url";
 import { App } from "@vibewithme/tui";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf-8"));
 
 const program = new Command();
 
 program
   .name("vibewithme")
   .description("Collaborative terminal IDE for vibe coding")
-  .version("0.1.0");
+  .version(pkg.version);
 
 // Main command — launch the TUI
 program
