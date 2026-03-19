@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box, Text, useInput } from "ink";
 import { theme } from "../../theme.js";
 import { useChatStore } from "../../store/chat.js";
+import { useClaudeAgent } from "../../hooks/useClaudeAgent.js";
 
 interface ChatInputProps {
   isFocused: boolean;
@@ -11,6 +12,7 @@ export function ChatInput({ isFocused }: ChatInputProps) {
   const [cursorVisible, setCursorVisible] = React.useState(true);
   const { inputValue, setInputValue, addMessage, isAgentRunning } =
     useChatStore();
+  const { runAgent, interrupt } = useClaudeAgent();
 
   // Blink cursor
   React.useEffect(() => {
@@ -22,6 +24,12 @@ export function ChatInput({ isFocused }: ChatInputProps) {
   useInput(
     (input, key) => {
       if (!isFocused) return;
+
+      // Ctrl+C interrupts running agent
+      if (key.ctrl && input === "c" && isAgentRunning) {
+        interrupt();
+        return;
+      }
 
       if (key.return && inputValue.trim()) {
         const text = inputValue.trim();
@@ -38,16 +46,9 @@ export function ChatInput({ isFocused }: ChatInputProps) {
 
         setInputValue("");
 
-        // If @ai, we'd trigger Claude here (Phase 2)
+        // Trigger Claude Agent SDK
         if (isAiMention && !isAgentRunning) {
-          // TODO: trigger Claude Agent SDK
-          addMessage({
-            userId: "system",
-            userName: "system",
-            userColor: theme.colors.systemText,
-            text: "Claude Agent integration coming in the next build!",
-            type: "system",
-          });
+          runAgent(text);
         }
         return;
       }

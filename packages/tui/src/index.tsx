@@ -1,1 +1,1 @@
-export { App } from "./app.js";
+export { App, CollabContext, useCollab } from "./app.js";

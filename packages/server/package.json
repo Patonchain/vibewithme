@@ -14,6 +14,13 @@
     "typescript": "^5.7.0"
   },
   "dependencies": {
-    "@vibewithme/shared": "*"
+    "@hocuspocus/server": "^3.4.4",
+    "@hono/node-server": "^1.19.11",
+    "@vibewithme/shared": "*",
+    "argon2": "^0.44.0",
+    "hono": "^4.12.8",
+    "jose": "^6.2.2",
+    "nanoid": "^5.1.7",
+    "yjs": "^13.6.30"
   }
 }
