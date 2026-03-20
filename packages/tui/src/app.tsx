@@ -16,7 +16,6 @@ import {
   type RemoteUser,
 } from "./hooks/useCollaboration.js";
 
-// Collaboration context available to all components
 interface CollabContextValue {
   connected: boolean;
   remoteUsers: RemoteUser[];
@@ -52,10 +51,8 @@ export function App({ projectPath, serverUrl, token, roomId }: AppProps) {
   const modal = useUIStore((s) => s.modal);
   const setModal = useUIStore((s) => s.setModal);
 
-  // Collaboration
   const collab = useCollaboration(serverUrl, token, roomId);
 
-  // Track terminal size
   useEffect(() => {
     if (!stdout) return;
     const updateSize = () => {
@@ -63,23 +60,16 @@ export function App({ projectPath, serverUrl, token, roomId }: AppProps) {
     };
     updateSize();
     stdout.on("resize", updateSize);
-    return () => {
-      stdout.off("resize", updateSize);
-    };
+    return () => { stdout.off("resize", updateSize); };
   }, [stdout, setTerminalSize]);
 
-  // Load project
   useEffect(() => {
-    if (projectPath) {
-      setProjectPath(projectPath);
-    }
+    if (projectPath) setProjectPath(projectPath);
     loadProject(projectPath);
   }, [projectPath, setProjectPath, loadProject]);
 
-  // Global keybindings
   useKeyBindings();
 
-  // Update presence when panel changes
   const focusedPanel = useUIStore((s) => s.focusedPanel);
   useEffect(() => {
     collab.setPresence({ panel: focusedPanel });
@@ -96,23 +86,13 @@ export function App({ projectPath, serverUrl, token, roomId }: AppProps) {
         </Box>
         <Footer />
 
-        {/* Modal overlays */}
         {modal === "command-palette" && (
-          <Box
-            position="absolute"
-            marginTop={3}
-            marginLeft={20}
-          >
+          <Box position="absolute" marginTop={3} marginLeft={20}>
             <CommandPalette onClose={() => setModal(null)} />
           </Box>
         )}
-
         {modal === "invite" && (
-          <Box
-            position="absolute"
-            marginTop={5}
-            marginLeft={15}
-          >
+          <Box position="absolute" marginTop={5} marginLeft={15}>
             <InviteModal
               serverUrl={serverUrl}
               token={token}

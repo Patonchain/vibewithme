@@ -1,6 +1,6 @@
 {
   "name": "vibewithme",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Collaborative terminal IDE for vibe coding. Figma meets v0, in your terminal.",
   "type": "module",
   "bin": {

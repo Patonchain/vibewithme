@@ -1,42 +1,58 @@
+// ═══════════════════════════════════════════════════════════
+// EVANGELION / NERV TERMINAL AESTHETIC
+// ═══════════════════════════════════════════════════════════
+
 export const theme = {
   colors: {
-    bg: "#1e1e2e",
-    surface: "#313244",
-    border: "#45475a",
-    borderFocus: "#89b4fa",
-    text: "#cdd6f4",
-    textDim: "#6c7086",
-    textBright: "#f5f5f5",
-    primary: "#89b4fa",
-    secondary: "#a6e3a1",
-    accent: "#f5c2e7",
-    warning: "#f9e2af",
-    error: "#f38ba8",
-    success: "#a6e3a1",
-    aiBubble: "#b4befe",
-    userBubble: "#89b4fa",
-    systemText: "#6c7086",
+    // Core
+    bg: "#0a0a0a",
+    surface: "#111411",
+    border: "#1a3a1a",
+    borderFocus: "#ff6600",
+    borderWarn: "#ff3300",
+
+    // Text
+    text: "#88aa88",
+    textDim: "#3a5a3a",
+    textBright: "#ccffcc",
+    textWhite: "#e0ffe0",
+
+    // Evangelion accents
+    primary: "#ff6600",       // NERV orange
+    secondary: "#00ff66",     // Terminal green
+    accent: "#ff3300",        // Warning red
+    warning: "#ffaa00",       // Amber
+    error: "#ff0033",         // Alert red
+    success: "#00ff44",       // System green
+
+    // UI specific
+    aiBubble: "#ff6600",      // Claude = NERV orange
+    userBubble: "#00ff66",    // User = green
+    systemText: "#3a6a3a",    // Dim system messages
+
+    // Noise/border characters
+    noise: "#1a3a1a",         // Dim green noise
+    noiseBright: "#2a5a2a",   // Brighter noise
+    noiseAccent: "#ff6600",   // Orange noise highlights
   },
-  borders: {
-    single: "single" as const,
-    double: "double" as const,
-    round: "round" as const,
-    bold: "bold" as const,
-  },
+
+  // Block characters for noise borders
+  noiseChars: ["░", "▒", "▓", "█", "▄", "▀", "▌", "▐", "┃", "║", "│"],
+  borderChars: ["╔", "╗", "╚", "╝", "═", "║", "╠", "╣", "╦", "╩", "╬"],
+
   icons: {
     file: "  ",
-    folder: "  ",
-    folderOpen: "  ",
-    chevronRight: " >",
-    chevronDown: " v",
-    online: " *",
-    offline: " o",
-    idle: " ~",
-    ai: " #",
-    lock: " !",
-    check: " +",
-    cross: " x",
-    spinner: " -",
+    folder: "▸ ",
+    folderOpen: "▾ ",
+    online: "◆",
+    offline: "◇",
+    idle: "◈",
+    ai: "◉",
+    lock: "⊡",
+    check: "✓",
+    cross: "✗",
+    arrow: "►",
+    dot: "·",
   },
 } as const;
 

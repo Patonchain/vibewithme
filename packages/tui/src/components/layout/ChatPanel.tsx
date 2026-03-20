@@ -13,13 +13,21 @@ export function ChatPanel() {
       flexDirection="column"
       width={34}
       borderStyle="single"
-      borderColor={isFocused ? theme.colors.borderFocus : theme.colors.border}
+      borderColor={isFocused ? theme.colors.primary : theme.colors.border}
     >
-      <Box paddingX={1}>
+      {/* Header */}
+      <Box paddingX={1} justifyContent="space-between">
         <Text bold color={theme.colors.primary}>
-          Chat
+          COMMS
         </Text>
-        <Text color={theme.colors.textDim}> | @ai for Claude</Text>
+        <Text color={theme.colors.textDim}>@ai = CLAUDE</Text>
+      </Box>
+
+      {/* Separator */}
+      <Box>
+        <Text color={theme.colors.border}>
+          {"─".repeat(32)}
+        </Text>
       </Box>
 
       {/* Messages */}
@@ -27,8 +35,15 @@ export function ChatPanel() {
         <MessageList />
       </Box>
 
+      {/* Input separator */}
+      <Box>
+        <Text color={theme.colors.border}>
+          {"─".repeat(32)}
+        </Text>
+      </Box>
+
       {/* Input */}
-      <Box paddingX={1} borderStyle="single" borderColor={theme.colors.border} borderTop borderBottom={false} borderLeft={false} borderRight={false}>
+      <Box paddingX={1}>
         <ChatInput isFocused={isFocused} />
       </Box>
     </Box>

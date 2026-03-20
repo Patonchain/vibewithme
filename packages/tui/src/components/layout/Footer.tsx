@@ -2,44 +2,48 @@ import React from "react";
 import { Box, Text } from "ink";
 import { theme } from "../../theme.js";
 import { useUIStore } from "../../store/ui.js";
-import { useChatStore } from "../../store/chat.js";
+import { useClaudeStore } from "../../store/claude.js";
 
 export function Footer() {
   const focusedPanel = useUIStore((s) => s.focusedPanel);
-  const isAgentRunning = useChatStore((s) => s.isAgentRunning);
+  const isClaudeRunning = useClaudeStore((s) => s.isRunning);
+
+  const items = [
+    { key: "^1", label: "FILES", panel: "sidebar" as const },
+    { key: "^2", label: "EDITOR", panel: "workspace" as const },
+    { key: "^3", label: "CHAT", panel: "chat" as const },
+    { key: "^P", label: "PALETTE", panel: null },
+    { key: "@ai", label: "CLAUDE", panel: null },
+  ];
 
   return (
     <Box paddingX={1} justifyContent="space-between">
       <Box gap={2}>
-        <Text color={theme.colors.textDim}>
-          <Text bold color={focusedPanel === "sidebar" ? theme.colors.primary : undefined}>
-            ^1
-          </Text>{" "}
-          Files
-        </Text>
-        <Text color={theme.colors.textDim}>
-          <Text bold color={focusedPanel === "workspace" ? theme.colors.primary : undefined}>
-            ^2
-          </Text>{" "}
-          Editor
-        </Text>
-        <Text color={theme.colors.textDim}>
-          <Text bold color={focusedPanel === "chat" ? theme.colors.primary : undefined}>
-            ^3
-          </Text>{" "}
-          Chat
-        </Text>
-        <Text color={theme.colors.textDim}>
-          <Text bold>^P</Text> Palette
-        </Text>
-        <Text color={theme.colors.textDim}>
-          <Text bold>@ai</Text> Claude
-        </Text>
+        {items.map((item) => (
+          <Text key={item.key} color={theme.colors.textDim}>
+            <Text
+              bold
+              color={
+                item.panel === focusedPanel
+                  ? theme.colors.primary
+                  : theme.colors.secondary
+              }
+            >
+              {item.key}
+            </Text>{" "}
+            {item.label}
+          </Text>
+        ))}
       </Box>
       <Box gap={1}>
-        {isAgentRunning && (
-          <Text color={theme.colors.aiBubble}>Claude is working...</Text>
+        {isClaudeRunning && (
+          <Text color={theme.colors.warning}>
+            ◈ PROCESSING | ^C STOP
+          </Text>
         )}
+        <Text color={theme.colors.textDim}>
+          NERV//OS v0.1
+        </Text>
       </Box>
     </Box>
   );
