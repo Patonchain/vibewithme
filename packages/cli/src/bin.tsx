@@ -37,6 +37,9 @@ program
         />,
         {
           exitOnCtrlC: true,
+          // Cap frame rate and only rewrite changed lines to avoid full-screen flicker.
+          maxFps: 12,
+          incrementalRendering: true,
         },
       );
 
