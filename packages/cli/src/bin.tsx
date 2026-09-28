@@ -22,21 +22,28 @@ program
   .option("-s, --server <url>", "Collaboration server URL", "http://localhost:3847")
   .option("-r, --room <id>", "Room ID to join")
   .option("--solo", "Run without collaboration server")
+  .option("--mobile", "Force single-pane vertical layout (phones / Termux)")
+  .option("--desktop", "Force three-column layout")
   .action(
     (
       projectPath: string,
-      options: { server?: string; room?: string; solo?: boolean },
+      options: { server?: string; room?: string; solo?: boolean; mobile?: boolean; desktop?: boolean },
     ) => {
       const resolvedPath = path.resolve(projectPath);
+      const layout = options.mobile ? "mobile" : options.desktop ? "desktop" : "auto";
 
       const { waitUntilExit } = render(
         <App
           projectPath={resolvedPath}
           serverUrl={options.solo ? undefined : options.server}
           roomId={options.room}
+          layout={layout}
         />,
         {
           exitOnCtrlC: true,
+          // Cap frame rate and only rewrite changed lines to avoid full-screen flicker.
+          maxFps: 12,
+          incrementalRendering: true,
         },
       );
 

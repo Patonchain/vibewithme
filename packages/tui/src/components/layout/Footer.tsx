@@ -4,9 +4,39 @@ import { theme } from "../../theme.js";
 import { useUIStore } from "../../store/ui.js";
 import { useClaudeStore } from "../../store/claude.js";
 
-export function Footer() {
+export function Footer({ compact = false }: { compact?: boolean }) {
   const focusedPanel = useUIStore((s) => s.focusedPanel);
   const isClaudeRunning = useClaudeStore((s) => s.isRunning);
+
+  if (compact) {
+    const tabs = [
+      { key: "1", label: "FILES", panel: "sidebar" as const },
+      { key: "2", label: "EDIT", panel: "workspace" as const },
+      { key: "3", label: "CHAT", panel: "chat" as const },
+    ];
+    return (
+      <Box paddingX={1} justifyContent="space-between" width="100%">
+        <Box gap={1}>
+          {tabs.map((item) => (
+            <Text
+              key={item.key}
+              bold={item.panel === focusedPanel}
+              color={
+                item.panel === focusedPanel
+                  ? theme.colors.primary
+                  : theme.colors.textDim
+              }
+            >
+              [{item.key} {item.label}]
+            </Text>
+          ))}
+        </Box>
+        <Text color={theme.colors.textDim}>
+          {isClaudeRunning ? "◈" : "tab"}
+        </Text>
+      </Box>
+    );
+  }
 
   const items = [
     { key: "^1", label: "FILES", panel: "sidebar" as const },

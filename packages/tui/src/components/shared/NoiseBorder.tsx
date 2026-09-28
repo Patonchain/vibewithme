@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Box, Text } from "ink";
 import { theme } from "../../theme.js";
 
-// Port of heavyNoise from agent-bank patterns
 function heavyNoise(x: number, y: number, t: number): number {
   const v =
     Math.sin(x * 3.2 + t * 0.3) * Math.cos(y * 3.5 - t * 0.25) +
@@ -22,11 +21,14 @@ function noiseToChar(value: number): string {
   return BLOCK_CHARS[idx];
 }
 
-function noiseToColor(value: number): string {
-  if (value > 0.3) return theme.colors.noiseAccent;
-  if (value > 0.1) return theme.colors.noiseBright;
-  if (value > -0.1) return theme.colors.noise;
-  return theme.colors.bg;
+function noiseRow(innerWidth: number, yPos: number, height: number, t: number): string {
+  let out = "";
+  for (let x = 0; x < innerWidth; x++) {
+    const nx = (x / Math.max(1, innerWidth)) * 4 - 2;
+    const ny = (yPos / Math.max(1, height)) * 4 - 2;
+    out += noiseToChar(heavyNoise(nx, ny, t));
+  }
+  return out;
 }
 
 interface NoiseBorderProps {
@@ -49,90 +51,72 @@ export function NoiseBorder({
   useEffect(() => {
     const interval = setInterval(() => {
       setTick((t) => t + 1);
-    }, 150); // ~7fps animation
+    }, 800);
     return () => clearInterval(interval);
   }, []);
 
   const t = tick * 0.3;
   const borderColor = focused ? theme.colors.primary : theme.colors.border;
   const innerWidth = Math.max(1, width - 2);
+  const sideHeight = Math.max(0, height - 2);
 
-  // Generate noise strips for top and bottom borders
-  function renderNoiseRow(yPos: number): React.ReactNode {
-    const chars: React.ReactNode[] = [];
-    for (let x = 0; x < innerWidth; x++) {
-      const nx = (x / innerWidth) * 4 - 2;
-      const ny = (yPos / height) * 4 - 2;
-      const v = heavyNoise(nx, ny, t);
-      chars.push(
-        <Text key={x} color={noiseToColor(v)}>
-          {noiseToChar(v)}
-        </Text>,
-      );
+  const topRow = useMemo(() => noiseRow(innerWidth, 0, height, t), [innerWidth, height, t]);
+  const botRow = useMemo(() => noiseRow(innerWidth, height, height, t), [innerWidth, height, t]);
+  const leftCol = useMemo(() => {
+    const chars: string[] = [];
+    for (let i = 0; i < sideHeight; i++) {
+      const ny = ((i + 1) / Math.max(1, height)) * 4 - 2;
+      chars.push(noiseToChar(heavyNoise(-2, ny, t)));
     }
     return chars;
-  }
+  }, [sideHeight, height, t]);
+  const rightCol = useMemo(() => {
+    const chars: string[] = [];
+    for (let i = 0; i < sideHeight; i++) {
+      const ny = ((i + 1) / Math.max(1, height)) * 4 - 2;
+      chars.push(noiseToChar(heavyNoise(2, ny, t)));
+    }
+    return chars;
+  }, [sideHeight, height, t]);
 
-  // Top border with label
   const topLeft = focused ? "╔" : "┌";
   const topRight = focused ? "╗" : "┐";
   const botLeft = focused ? "╚" : "└";
   const botRight = focused ? "╝" : "┘";
 
+  const labelText = label ? ` ${label.toUpperCase()} ` : "";
+  const topFill = topRow.slice(labelText.length);
+
   return (
     <Box flexDirection="column" width={width}>
-      {/* Top noise strip */}
-      <Box>
+      <Text>
         <Text color={borderColor}>{topLeft}</Text>
-        {label ? (
-          <>
-            <Text color={theme.colors.primary} bold>
-              {" "}
-              {label.toUpperCase()}{" "}
-            </Text>
-            {renderNoiseRow(0)}
-          </>
-        ) : (
-          renderNoiseRow(0)
-        )}
+        {labelText ? (
+          <Text color={theme.colors.primary} bold>
+            {labelText}
+          </Text>
+        ) : null}
+        <Text color={theme.colors.noise}>{topFill || topRow}</Text>
         <Text color={borderColor}>{topRight}</Text>
-      </Box>
+      </Text>
 
-      {/* Content with side noise */}
       <Box flexDirection="row" flexGrow={1}>
         <Box flexDirection="column">
-          {Array.from({ length: Math.max(0, height - 2) }, (_, i) => {
-            const ny = ((i + 1) / height) * 4 - 2;
-            const v = heavyNoise(-2, ny, t);
-            return (
-              <Text key={i} color={noiseToColor(v)}>
-                {noiseToChar(v)}
-              </Text>
-            );
-          })}
+          <Text color={theme.colors.noise}>{leftCol.join("\n")}</Text>
         </Box>
         <Box flexDirection="column" flexGrow={1}>
           {children}
         </Box>
         <Box flexDirection="column">
-          {Array.from({ length: Math.max(0, height - 2) }, (_, i) => {
-            const ny = ((i + 1) / height) * 4 - 2;
-            const v = heavyNoise(2, ny, t);
-            return (
-              <Text key={i} color={noiseToColor(v)}>
-                {noiseToChar(v)}
-              </Text>
-            );
-          })}
+          <Text color={theme.colors.noise}>{rightCol.join("\n")}</Text>
         </Box>
       </Box>
 
-      {/* Bottom noise strip */}
-      <Box>
+      <Text>
         <Text color={borderColor}>{botLeft}</Text>
-        {renderNoiseRow(height)}
+        <Text color={theme.colors.noise}>{botRow}</Text>
         <Text color={borderColor}>{botRight}</Text>
-      </Box>
+      </Text>
     </Box>
   );
 }

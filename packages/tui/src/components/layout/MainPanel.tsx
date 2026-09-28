@@ -7,8 +7,9 @@ import { useClaudeStore } from "../../store/claude.js";
 import { FileViewer } from "../workspace/FileViewer.js";
 import { ClaudeTerminal } from "../workspace/ClaudeTerminal.js";
 
-export function MainPanel() {
+export function MainPanel({ fill = false }: { fill?: boolean }) {
   const isFocused = useUIStore((s) => s.focusedPanel === "workspace");
+  const terminalWidth = useUIStore((s) => s.terminalWidth);
   const activeFile = useWorkspaceStore((s) => s.activeFile);
   const projectName = useWorkspaceStore((s) => s.projectName);
   const { isRunning, events } = useClaudeStore();
@@ -20,6 +21,7 @@ export function MainPanel() {
     <Box
       flexDirection="column"
       flexGrow={1}
+      width={fill ? "100%" : undefined}
       borderStyle="single"
       borderColor={isFocused ? theme.colors.primary : theme.colors.border}
     >
@@ -47,7 +49,7 @@ export function MainPanel() {
       {/* Separator */}
       <Box>
         <Text color={theme.colors.border}>
-          {"─".repeat(50)}
+          {"─".repeat(Math.max(8, (fill ? terminalWidth : 50) - 2))}
         </Text>
       </Box>
 

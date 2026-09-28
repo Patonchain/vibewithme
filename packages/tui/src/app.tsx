@@ -41,17 +41,27 @@ interface AppProps {
   serverUrl?: string;
   token?: string;
   roomId?: string;
+  layout?: "auto" | "mobile" | "desktop";
 }
 
-export function App({ projectPath, serverUrl, token, roomId }: AppProps) {
+export function App({ projectPath, serverUrl, token, roomId, layout = "auto" }: AppProps) {
   const { stdout } = useStdout();
   const setTerminalSize = useUIStore((s) => s.setTerminalSize);
+  const setLayoutPreference = useUIStore((s) => s.setLayoutPreference);
+  const layoutPreference = useUIStore((s) => s.layoutPreference);
+  const terminalWidth = useUIStore((s) => s.terminalWidth);
+  const terminalHeight = useUIStore((s) => s.terminalHeight);
+  const focusedPanel = useUIStore((s) => s.focusedPanel);
   const setProjectPath = useWorkspaceStore((s) => s.setProjectPath);
   const { loadProject } = useFileSystem();
   const modal = useUIStore((s) => s.modal);
   const setModal = useUIStore((s) => s.setModal);
 
   const collab = useCollaboration(serverUrl, token, roomId);
+
+  useEffect(() => {
+    setLayoutPreference(layout);
+  }, [layout, setLayoutPreference]);
 
   useEffect(() => {
     if (!stdout) return;
@@ -63,6 +73,11 @@ export function App({ projectPath, serverUrl, token, roomId }: AppProps) {
     return () => { stdout.off("resize", updateSize); };
   }, [stdout, setTerminalSize]);
 
+  const isMobile =
+    layoutPreference === "mobile" ||
+    (layoutPreference === "auto" &&
+      (terminalWidth < 80 || terminalWidth < terminalHeight));
+
   useEffect(() => {
     if (projectPath) setProjectPath(projectPath);
     loadProject(projectPath);
@@ -70,29 +85,36 @@ export function App({ projectPath, serverUrl, token, roomId }: AppProps) {
 
   useKeyBindings();
 
-  const focusedPanel = useUIStore((s) => s.focusedPanel);
   useEffect(() => {
     collab.setPresence({ panel: focusedPanel });
   }, [focusedPanel, collab.setPresence]);
 
   return (
     <CollabContext.Provider value={collab}>
-      <Box flexDirection="column" height="100%">
-        <Header />
-        <Box flexDirection="row" flexGrow={1}>
-          <Sidebar />
-          <MainPanel />
-          <ChatPanel />
-        </Box>
-        <Footer />
+      <Box flexDirection="column" height="100%" width="100%">
+        <Header compact={isMobile} />
+        {isMobile ? (
+          <Box flexDirection="column" flexGrow={1} width="100%">
+            {focusedPanel === "sidebar" && <Sidebar fill />}
+            {focusedPanel === "workspace" && <MainPanel fill />}
+            {focusedPanel === "chat" && <ChatPanel fill />}
+          </Box>
+        ) : (
+          <Box flexDirection="row" flexGrow={1}>
+            <Sidebar />
+            <MainPanel />
+            <ChatPanel />
+          </Box>
+        )}
+        <Footer compact={isMobile} />
 
         {modal === "command-palette" && (
-          <Box position="absolute" marginTop={3} marginLeft={20}>
+          <Box position="absolute" marginTop={isMobile ? 2 : 3} marginLeft={isMobile ? 1 : 20}>
             <CommandPalette onClose={() => setModal(null)} />
           </Box>
         )}
         {modal === "invite" && (
-          <Box position="absolute" marginTop={5} marginLeft={15}>
+          <Box position="absolute" marginTop={isMobile ? 3 : 5} marginLeft={isMobile ? 1 : 15}>
             <InviteModal
               serverUrl={serverUrl}
               token={token}

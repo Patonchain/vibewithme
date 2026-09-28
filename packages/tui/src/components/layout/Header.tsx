@@ -3,13 +3,47 @@ import { Box, Text } from "ink";
 import { theme } from "../../theme.js";
 import { useWorkspaceStore } from "../../store/workspace.js";
 import { useClaudeStore } from "../../store/claude.js";
+import { useUIStore } from "../../store/ui.js";
 import { useCollab } from "../../app.js";
 import { NoisePanel } from "../shared/NoisePanel.js";
 
-export function Header() {
+export function Header({ compact = false }: { compact?: boolean }) {
   const projectName = useWorkspaceStore((s) => s.projectName);
   const isClaudeRunning = useClaudeStore((s) => s.isRunning);
+  const terminalWidth = useUIStore((s) => s.terminalWidth);
   const { remoteUsers, connected, roomId } = useCollab();
+
+  const liveCount = remoteUsers.filter((u) => Date.now() - u.lastActive < 30000).length;
+  const liveLabel = roomId
+    ? connected
+      ? `LIVE ${1 + liveCount}`
+      : "OFFLINE"
+    : null;
+
+  if (compact) {
+    return (
+      <Box paddingX={1} justifyContent="space-between" width="100%">
+        <Text bold color={theme.colors.primary}>
+          ◉ VWM
+        </Text>
+        <Text color={theme.colors.secondary}>
+          {(projectName || "NO PROJECT").slice(0, Math.max(8, terminalWidth - 22))}
+        </Text>
+        <Box gap={1}>
+          {isClaudeRunning && (
+            <Text color={theme.colors.warning} bold>
+              ◈
+            </Text>
+          )}
+          {liveLabel && (
+            <Text color={connected ? theme.colors.success : theme.colors.error}>
+              {liveLabel}
+            </Text>
+          )}
+        </Box>
+      </Box>
+    );
+  }
 
   const statusLine = (
     <Box justifyContent="space-between" width="100%">
@@ -51,7 +85,7 @@ export function Header() {
   );
 
   return (
-    <NoisePanel cols={80} rows={3} pattern="heavyNoise">
+    <NoisePanel cols={Math.min(80, Math.max(20, terminalWidth))} rows={3} pattern="heavyNoise">
       {statusLine}
     </NoisePanel>
   );

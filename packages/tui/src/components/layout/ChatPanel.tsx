@@ -5,13 +5,16 @@ import { useUIStore } from "../../store/ui.js";
 import { MessageList } from "../chat/MessageList.js";
 import { ChatInput } from "../chat/ChatInput.js";
 
-export function ChatPanel() {
+export function ChatPanel({ fill = false }: { fill?: boolean }) {
   const isFocused = useUIStore((s) => s.focusedPanel === "chat");
+  const terminalWidth = useUIStore((s) => s.terminalWidth);
+  const ruleWidth = Math.max(8, (fill ? terminalWidth : 34) - 2);
 
   return (
     <Box
       flexDirection="column"
-      width={34}
+      width={fill ? "100%" : 34}
+      flexGrow={fill ? 1 : undefined}
       borderStyle="single"
       borderColor={isFocused ? theme.colors.primary : theme.colors.border}
     >
@@ -26,7 +29,7 @@ export function ChatPanel() {
       {/* Separator */}
       <Box>
         <Text color={theme.colors.border}>
-          {"─".repeat(32)}
+          {"─".repeat(ruleWidth)}
         </Text>
       </Box>
 
@@ -38,7 +41,7 @@ export function ChatPanel() {
       {/* Input separator */}
       <Box>
         <Text color={theme.colors.border}>
-          {"─".repeat(32)}
+          {"─".repeat(ruleWidth)}
         </Text>
       </Box>
 

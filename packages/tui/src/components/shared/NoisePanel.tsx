@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Box, Text } from "ink";
 import { theme } from "../../theme.js";
-
-// ── SDF patterns ported from agent-bank/src/lib/patterns.ts ──
 
 function heavyNoise(x: number, y: number, t: number): number {
   const v =
@@ -23,15 +21,11 @@ function plasma(x: number, y: number, t: number): number {
   return v * 0.15 - 0.05;
 }
 
-// ── Smoothstep from dotmatrix.ts ──
-
 function smoothstep(a: number, b: number, x: number): number {
   const t = Math.max(0, Math.min(1, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
 }
 
-// ── Terminal dot characters (density levels) ──
-// Maps opacity 0→1 to increasingly dense block chars
 const DENSITY = [" ", "·", "∙", ":", "░", "▒", "▓", "█"];
 
 function opacityToChar(opacity: number): string {
@@ -44,20 +38,14 @@ function opacityToChar(opacity: number): string {
 }
 
 function opacityToColor(opacity: number): string {
-  if (opacity > 0.7) return theme.colors.primary;   // NERV orange for hot
+  if (opacity > 0.7) return theme.colors.primary;
   if (opacity > 0.4) return theme.colors.noiseBright;
   if (opacity > 0.15) return theme.colors.noise;
   return theme.colors.bg;
 }
 
-// ── Breathe effect from dotmatrix engine ──
-
 function breathe(col: number, row: number, t: number): number {
-  return (
-    Math.sin(col * 0.7 + t * 1.5) *
-    Math.cos(row * 0.5 + t * 1.1) *
-    0.025
-  );
+  return Math.sin(col * 0.7 + t * 1.5) * Math.cos(row * 0.5 + t * 1.1) * 0.025;
 }
 
 interface NoisePanelProps {
@@ -69,6 +57,51 @@ interface NoisePanelProps {
 
 const patterns = { heavyNoise, plasma };
 
+type Segment = { color: string; text: string };
+
+function buildRows(
+  cols: number,
+  rows: number,
+  elapsed: number,
+  pattern: "heavyNoise" | "plasma",
+): Segment[][] {
+  const fn = patterns[pattern];
+  const grid: Segment[][] = [];
+
+  for (let row = 0; row < rows; row++) {
+    const segments: Segment[] = [];
+    let currentColor: string | null = null;
+    let buf = "";
+
+    for (let col = 0; col < cols; col++) {
+      const nx = cols > 1 ? (col / (cols - 1)) * 2 - 1 : 0;
+      const ny = rows > 1 ? (row / (rows - 1)) * 2 - 1 : 0;
+      const d = fn(nx, ny, elapsed);
+      const b = breathe(col, row, elapsed);
+      const opacity = 1 - smoothstep(-0.1, 0.03 + b, d);
+      const color = opacityToColor(opacity);
+      const char = opacityToChar(opacity);
+
+      if (currentColor === null) {
+        currentColor = color;
+        buf = char;
+      } else if (color === currentColor) {
+        buf += char;
+      } else {
+        segments.push({ color: currentColor, text: buf });
+        currentColor = color;
+        buf = char;
+      }
+    }
+    if (currentColor !== null && buf.length > 0) {
+      segments.push({ color: currentColor, text: buf });
+    }
+    grid.push(segments);
+  }
+
+  return grid;
+}
+
 export function NoisePanel({
   cols,
   rows,
@@ -78,55 +111,37 @@ export function NoisePanel({
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => setTick((t) => t + 1), 120);
+    // Slow enough that Ink can patch without clearing the screen.
+    const interval = setInterval(() => setTick((t) => t + 1), 800);
     return () => clearInterval(interval);
   }, []);
 
-  const elapsed = tick * 0.12;
-  const fn = patterns[pattern];
+  const elapsed = tick * 0.35;
+  const grid = useMemo(
+    () => buildRows(cols, rows, elapsed, pattern),
+    [cols, rows, elapsed, pattern],
+  );
 
-  // Render the dot matrix grid
-  const grid: React.ReactNode[] = [];
-
-  for (let row = 0; row < rows; row++) {
-    const rowChars: React.ReactNode[] = [];
-
-    for (let col = 0; col < cols; col++) {
-      // Normalize to [-1, 1] like the canvas engine
-      const nx = cols > 1 ? (col / (cols - 1)) * 2 - 1 : 0;
-      const ny = rows > 1 ? (row / (rows - 1)) * 2 - 1 : 0;
-
-      const d = fn(nx, ny, elapsed);
-      const b = breathe(col, row, elapsed);
-      const opacity = 1 - smoothstep(-0.1, 0.03 + b, d);
-
-      const char = opacityToChar(opacity);
-      const color = opacityToColor(opacity);
-
-      rowChars.push(
-        <Text key={col} color={color}>
-          {char}
-        </Text>,
-      );
-    }
-
-    grid.push(
-      <Box key={row}>
-        {rowChars}
-      </Box>,
-    );
-  }
+  const rendered = grid.map((segments, row) => (
+    <Text key={row}>
+      {segments.map((seg, i) => (
+        <Text key={i} color={seg.color}>
+          {seg.text}
+        </Text>
+      ))}
+    </Text>
+  ));
 
   if (children) {
-    // Overlay children centered over the noise
+    const mid = Math.max(0, Math.floor(rows / 2) - 1);
     return (
       <Box flexDirection="column" width={cols}>
-        {grid.slice(0, Math.floor(rows / 2) - 1)}
+        {rendered.slice(0, mid)}
         <Box justifyContent="center">{children}</Box>
-        {grid.slice(Math.floor(rows / 2))}
+        {rendered.slice(mid)}
       </Box>
     );
   }
 
-  return <Box flexDirection="column">{grid}</Box>;
+  return <Box flexDirection="column">{rendered}</Box>;
 }

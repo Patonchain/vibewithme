@@ -13,11 +13,11 @@ A full terminal UI for non-technical founders building apps with AI. Browse file
 ```
 ┌─ vibewithme ─────────────────────────────────────────────────┐
 │  my-project                    * Pat  * Sarah       [live]   │
-├──────────┬─────────────────────────┬─────────────────────────┤
+├──────────┼─────────────────────────┼─────────────────────────┤
 │ Files    │  src/index.ts           │ Chat                    │
 │ ──────── │  1 | import express     │ ─────────────────       │
-│ > src/   │  2 | const app = ...    │ Pat: lets add auth      │
-│   index  │  3 | app.listen(3000)   │                         │
+│ > src/   │  2 | const app = ...     │ Pat: lets add auth      │
+│   index  │  3 | app.listen(3000)    │                         │
 │   auth   │                        │ @ai add JWT auth         │
 │ Secrets  │  [Claude editing...]   │ middleware to express     │
 │ ──────── │                        │                          │
@@ -28,7 +28,7 @@ A full terminal UI for non-technical founders building apps with AI. Browse file
 │ * Sarah  │                        │ > _                      │
 ├──────────┴─────────────────────────┴─────────────────────────┤
 │ ^1 Files  ^2 Editor  ^3 Chat  ^P Palette  @ai Claude        │
-└──────────────────────────────────────────────────────────────┘
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ## Features
@@ -46,6 +46,9 @@ A full terminal UI for non-technical founders building apps with AI. Browse file
 ```bash
 # Solo mode — just you and Claude
 npx vibewithme /path/to/project --solo
+
+# Phone / vertical terminal (Termux, iSH, …)
+npx vibewithme --solo --mobile
 
 # With collaboration server
 npx vibewithme serve                           # Terminal 1: start server
@@ -65,6 +68,8 @@ npx vibewithme /path/to/project --room myroom  # Terminal 2+: join room
 | `h/l` | Collapse/expand (file tree) |
 | `Enter` | Open file / send message |
 | `@ai ...` | Ask Claude to do something |
+
+On a narrow or taller-than-wide terminal the UI switches to a single-pane mobile layout automatically. Force it with `--mobile` or `--desktop`.
 
 ## Requirements
 

@@ -13,8 +13,8 @@ const tabs: Array<{ id: SidebarTab; label: string; key: string }> = [
   { id: "team", label: "TEAM", key: "3" },
 ];
 
-export function Sidebar() {
-  const { focusedPanel, sidebarTab, setSidebarTab, setModal } = useUIStore();
+export function Sidebar({ fill = false }: { fill?: boolean }) {
+  const { focusedPanel, sidebarTab, setSidebarTab, setModal, terminalWidth } = useUIStore();
   const isFocused = focusedPanel === "sidebar";
   const [showSecretForm, setShowSecretForm] = useState(false);
 
@@ -34,7 +34,8 @@ export function Sidebar() {
       flexDirection="column"
       borderStyle="single"
       borderColor={isFocused ? theme.colors.primary : theme.colors.border}
-      width={26}
+      width={fill ? "100%" : 26}
+      flexGrow={fill ? 1 : undefined}
     >
       {/* Tab bar */}
       <Box paddingX={1} gap={1}>
@@ -57,7 +58,7 @@ export function Sidebar() {
       {/* Separator */}
       <Box paddingX={0}>
         <Text color={theme.colors.border}>
-          {"─".repeat(24)}
+          {"─".repeat(Math.max(8, (fill ? terminalWidth : 26) - 2))}
         </Text>
       </Box>
 
